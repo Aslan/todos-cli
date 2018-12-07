@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Create Todo CLI",
+    "completed": true
+  },
+  {
+    "name": "Add load and save features",
+    "completed": true
+  },
+  {
+    "name": "Buy an apple",
+    "completed": false
+  },
+  {
+    "name": "Go to a Cafe",
+    "completed": true
+  },
+  {
+    "name": "Visit Busan",
+    "completed": false
+  },
+  {
+    "name": "Go to Changdeokgung Palace in Seoul",
+    "completed": true
+  },
+  {
+    "name": "Go to the Lotte World Tower in Seoul",
+    "completed": true
+  },
+  {
+    "name": "Visit Gangnam",
+    "completed": true
+  }
+]
