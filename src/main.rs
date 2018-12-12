@@ -1,13 +1,14 @@
 #[macro_use]
 extern crate serde_derive;
 
+extern crate clap;
 extern crate serde;
 extern crate serde_json;
 
-use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
+use clap::{App, SubCommand, Arg};
 use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
@@ -79,6 +80,7 @@ impl TodoList {
 }
 
 enum Command {
+    Help,
     Get,
     Add(String),
     Remove(usize),
@@ -86,15 +88,43 @@ enum Command {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let mut app = App::new("Todos CLI")
+        .version("1.0")
+        .author("Pepe Becker <mail@pepebecker.com>")
+        .about("Create and manage todos using the command line")
+        .subcommand(SubCommand::with_name("add")
+            .alias("new").alias("create").about("creates a new todo")
+            .arg(Arg::with_name("todo").required(true)))
+        .subcommand(SubCommand::with_name("toggle")
+            .about("toggles a todo between completed and not completed")
+            .arg(Arg::with_name("todo_num").required(true)))
+        .subcommand(SubCommand::with_name("remove")
+            .alias("delete").alias("rm").about("removes a todo")
+            .arg(Arg::with_name("todo_num").required(true)))
+        .subcommand(SubCommand::with_name("get")
+            .alias("list").alias("ls").about("lists all todos"));
 
-    let command = match args[1].as_str() {
-        "get" => Command::Get,
-        "add" => Command::Add(args[2].clone()),
-        "toggle" => Command::Toggle(args[2].parse().expect("Error converting to usize")),
-        "remove" => Command::Remove(args[2].parse().expect("Error converting to usize")),
-        _ => panic!("You must provide an accepted command")
-    };
+    let mut command = Command::Help;
+
+    match app.clone().get_matches().subcommand() {
+        ("add", Some(create)) => {
+            if let Some(todo) = create.value_of("todo") {
+                command = Command::Add(todo.to_string());
+            }
+        },
+        ("toggle", Some(toggle)) => {
+            if let Some(Ok(n)) = toggle.value_of("todo_num").map(|s| s.parse::<usize>()) {
+                command = Command::Toggle(n);
+            }
+        },
+        ("remove", Some(remove)) => {
+            if let Some(Ok(n)) = remove.value_of("todo_num").map(|s| s.parse::<usize>()) {
+                command = Command::Remove(n);
+            }
+        },
+        ("get", _) => command = Command::Get,
+        _ => command = Command::Help
+    }
 
     let mut todo_list = TodoList::load("todos.json".to_string());
 
@@ -114,6 +144,9 @@ fn main() {
             todo_list.toggle(index);
             todo_list.save("todos.json".to_string());
             todo_list.print();
+        },
+        Command::Help => {
+            let _ = app.print_help();
         }
     }
 }
