@@ -1,5 +1,6 @@
 # Todos CLI in Rust
 
+[![crates.io](https://img.shields.io/crates/v/todos.svg)](https://crates.io/crates/todos)
 [![MIT-licensed](https://img.shields.io/github/license/pepebecker/todos-cli.svg)](https://opensource.org/licenses/MIT)
 [![chat on gitter](https://badges.gitter.im/pepebecker.svg)](https://gitter.im/pepebecker)
 
