@@ -1,6 +1,6 @@
-# Todo CLI in Rust
+# Todos CLI in Rust
 
-[![MIT-licensed](https://img.shields.io/github/license/pepebecker/todo-cli.svg)](https://opensource.org/licenses/MIT)
+[![MIT-licensed](https://img.shields.io/github/license/pepebecker/todos-cli.svg)](https://opensource.org/licenses/MIT)
 [![chat on gitter](https://badges.gitter.im/pepebecker.svg)](https://gitter.im/pepebecker)
 
 ## Usage
@@ -31,4 +31,4 @@ cargo run remove 0
 
 ## Contributing
 
-If you **have a question**, **found a bug** or want to **propose a feature**, have a look at [the issues page](https://github.com/pepebecker/todo-cli/issues).
+If you **have a question**, **found a bug** or want to **propose a feature**, have a look at [the issues page](https://github.com/pepebecker/todos-cli/issues).
