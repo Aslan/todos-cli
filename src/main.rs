@@ -2,14 +2,13 @@
 extern crate serde_derive;
 
 extern crate clap;
-extern crate serde;
 extern crate serde_json;
 
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
+use std::io::Error;
 use clap::{App, SubCommand, Arg};
-use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
 struct TodoItem {
@@ -28,8 +27,8 @@ struct TodoList {
 }
 
 impl TodoList {
-     fn new() -> TodoList {
-         TodoList { list: Vec::new() }
+     fn new(vec: Vec<TodoItem>) -> TodoList {
+         TodoList { list: vec }
      }
 
     fn add(&mut self, name: String) {
@@ -50,32 +49,17 @@ impl TodoList {
         }
     }
 
-    fn load(path: String) -> TodoList {
-        let mut file = File::open(path).expect("Unable to open file");
+    fn load(path: &str) -> Result<TodoList, Error> {
+        let mut file = File::open(path)?;
         let mut data = String::new();
-        file.read_to_string(&mut data).expect("Unable to read content from file");
-
-        let mut list = TodoList::new();
-
-        let value: Value = serde_json::from_str(&data).expect("Unable to parse file content to json");
-        for item in value.as_array().unwrap() {
-            let name = item.get("name").expect("Unable to get name from json")
-                           .as_str().expect("Unable to cast name to str");
-            let completed = item.get("completed").expect("Unable to get completed from json")
-                            .as_bool().expect("Unable to cast completed to bool");
-            list.add(name.to_string());
-            if completed {
-                list.toggle(list.list.len() - 1);
-            }
-        }
-
-        list
+        file.read_to_string(&mut data)?;
+        Ok(TodoList::new(serde_json::from_str(&data).unwrap()))
     }
 
-    fn save(&self, path: String) {
-        let json = serde_json::to_string_pretty(&self.list).expect("Unable to parse todos to json");
-        let mut file = File::create(path).expect("Unable to create json file");
-        file.write_all(json.as_bytes()).expect("Unable to write json to file");
+    fn save(&self, path: String) -> Result<(), Error> {
+        let json = serde_json::to_string_pretty(&self.list).unwrap();
+        let mut file = File::create(path).unwrap();
+        file.write_all(json.as_bytes())
     }
 }
 
@@ -85,6 +69,14 @@ enum Command {
     Add(String),
     Remove(usize),
     Toggle(usize)
+}
+
+fn print_todos_if_ok(res: Result<(), Error>, todos: TodoList) {
+    if res.is_ok() {
+        todos.print();
+    } else {
+        println!("Error: {}", res.err().unwrap());
+    }
 }
 
 fn main() {
@@ -126,24 +118,22 @@ fn main() {
         _ => command = Command::Help
     }
 
-    let mut todo_list = TodoList::load("todos.json".to_string());
+    let path = "todos.json".to_string();
+    let mut todo_list = TodoList::load(path.as_str()).unwrap();
 
     match command {
         Command::Get => todo_list.print(),
         Command::Add(task) => {
             todo_list.add(task);
-            todo_list.save("todos.json".to_string());
-            todo_list.print();
+            print_todos_if_ok(todo_list.save(path), todo_list);
         },
         Command::Remove(index) => {
             todo_list.remove(index);
-            todo_list.save("todos.json".to_string());
-            todo_list.print();
+            print_todos_if_ok(todo_list.save(path), todo_list);
         },
         Command::Toggle(index) => {
             todo_list.toggle(index);
-            todo_list.save("todos.json".to_string());
-            todo_list.print();
+            print_todos_if_ok(todo_list.save(path), todo_list);
         },
         Command::Help => {
             let _ = app.print_help();

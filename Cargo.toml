@@ -8,7 +8,7 @@ repository = "https://github.com/pepebecker/todos-cli"
 license = "MIT"
 
 [dependencies]
-clap = "2.32.0"
-serde = "1.0.80"
-serde_json = "1.0"
-serde_derive = "1.0.80"
+clap = "2.33.0"
+serde = "1.0.91"
+serde_json = "1.0.39"
+serde_derive = "1.0.91"
