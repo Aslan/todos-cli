@@ -33,6 +33,10 @@
   },
   {
     "name": "Go to Taipei",
+    "completed": true
+  },
+  {
+    "name": "Go to Singapore",
     "completed": false
   }
 ]
